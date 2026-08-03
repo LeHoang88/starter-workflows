@@ -20,6 +20,8 @@ jobs:
       with:
         node-version: '12'
     - name: Check starter workflows for GHES compat
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         npm ci
         npx ts-node-script ./index.ts

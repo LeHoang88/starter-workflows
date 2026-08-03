@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import { safeLoad } from "js-yaml";
 import { basename, extname, join } from "path";
 import { exec } from "./exec";
+import { validateSession } from "./auth";
 
 interface WorkflowDesc {
   folder: string;
@@ -125,6 +126,8 @@ async function checkWorkflow(
 
 (async function main() {
   try {
+    validateSession();
+
     const settings = require("./settings.json");
 
     const result = await checkWorkflows(
