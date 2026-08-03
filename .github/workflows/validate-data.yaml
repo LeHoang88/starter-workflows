@@ -17,6 +17,8 @@ jobs:
           node-version: "12"
 
       - name: Validate workflows
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm ci
           npx ts-node-script ./index.ts
