@@ -1,0 +1,6 @@
+{
+    "name": "Claude Code",
+    "description": "Run Claude Code on your repository in response to @claude mentions in issues and pull requests. Requires an ANTHROPIC_API_KEY repository secret.",
+    "iconName": "octicon dependabot",
+    "categories": ["Automation", "code-review"]
+}
