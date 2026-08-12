@@ -1,0 +1,141 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String?
+  password      String
+  image         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  subscriptions Subscription[]
+  shopStores    ShopStore[]
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id              String   @id @default(cuid())
+  userId          String
+  stripeCustomerId String  @unique
+  stripePriceId   String
+  stripeSubscriptionId String? @unique
+  status          String   // active, canceled, past_due
+  currentPeriodStart DateTime?
+  currentPeriodEnd DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ShopStore {
+  id                String   @id @default(cuid())
+  userId            String
+  shopName          String
+  accessToken       String   @db.Text
+  apiKey            String
+  apiSecret         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  isActive          Boolean  @default(true)
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  integrations      Integration[]
+  reviews           Review[]
+  synthesizedReviews SynthesizedReview[]
+
+  @@unique([userId, shopName])
+}
+
+model Integration {
+  id              String   @id @default(cuid())
+  shopStoreId     String
+  type            String   // telegram, slack, webhook
+  config          Json     // store api keys, channel ids, etc
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  shopStore       ShopStore @relation(fields: [shopStoreId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id              String   @id @default(cuid())
+  shopStoreId     String
+  productId       String
+  productTitle    String
+  customerName    String
+  customerEmail   String?
+  rating          Int      // 1-5
+  content         String   @db.Text
+  shopifyReviewId String   @unique
+  createdAt       DateTime @default(now())
+  synced          Boolean  @default(false)
+
+  shopStore       ShopStore @relation(fields: [shopStoreId], references: [id], onDelete: Cascade)
+  synthesis       SynthesizedReview?
+}
+
+model SynthesizedReview {
+  id                  String   @id @default(cuid())
+  shopStoreId         String
+  reviewId            String   @unique
+  originalContent     String   @db.Text
+  synthesizedContent  String   @db.Text
+  sentiment           String   // positive, negative, neutral
+  keyPoints           String   @db.Text // JSON array
+  telegramMessageId   String?
+  telegramChatId      String?
+  sentToTelegram      Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  review              Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  shopStore           ShopStore @relation(fields: [shopStoreId], references: [id], onDelete: Cascade)
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  userId      String
+  key         String   @unique
+  name        String
+  lastUsed    DateTime?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime?
+}
