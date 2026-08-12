@@ -74,7 +74,7 @@ Sentiment: <b>${synthesis.sentiment.toUpperCase()}</b>`
 
   async deleteMessage(messageId: string): Promise<void> {
     try {
-      await this.bot.deleteMessage(this.chatId, messageId)
+      await this.bot.deleteMessage(this.chatId, parseInt(messageId, 10))
     } catch (error) {
       console.error('Error deleting Telegram message:', error)
     }

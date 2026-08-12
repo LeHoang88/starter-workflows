@@ -51,7 +51,7 @@ model Session {
 
 model Subscription {
   id              String   @id @default(cuid())
-  userId          String
+  userId          String   @unique
   stripeCustomerId String  @unique
   stripePriceId   String
   stripeSubscriptionId String? @unique

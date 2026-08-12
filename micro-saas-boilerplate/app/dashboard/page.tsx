@@ -14,7 +14,7 @@ interface ShopStore {
 }
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useSession() as any
   const [stores, setStores] = useState<ShopStore[]>([])
   const [loading, setLoading] = useState(true)
 

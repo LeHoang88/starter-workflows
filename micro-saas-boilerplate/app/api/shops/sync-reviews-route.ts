@@ -1,17 +1,17 @@
 // app/api/shops/[storeId]/sync-reviews/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-config'
-import { getShopifyService } from '@/lib/services/shopify'
-import { synthesizeReviewsForStore } from '@/lib/services/synthesis'
-import { getTelegramService } from '@/lib/services/telegram'
+import { authOptions } from '@/lib/auth_config'
+import { getShopifyService } from '@/lib/services/shopify_service'
+import { synthesizeReviewsForStore } from '@/lib/services/synthesis_service'
+import { getTelegramService } from '@/lib/services/telegram_service'
 import { prisma } from '@/lib/prisma'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { storeId: string } }
 ) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions) as any
 
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
