@@ -4,6 +4,7 @@ import { safeLoad } from "js-yaml";
 import { basename, extname, join } from "path";
 import { Validator as validator } from "jsonschema";
 import { endGroup, error, info, setFailed, startGroup } from '@actions/core';
+import { validateSession } from "./auth";
 
 interface WorkflowWithErrors {
   id: string;
@@ -116,6 +117,8 @@ async function checkWorkflow(workflowPath: string, propertiesPath: string, allow
 
 (async function main() {
   try {
+    validateSession();
+
     const settings = require("./settings.json");
     const erroredWorkflows = await checkWorkflows(
       settings.folders, settings.allowed_categories
